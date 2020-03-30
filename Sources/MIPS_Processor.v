@@ -74,7 +74,7 @@ Control
 ControlUnit
 (
 	.OP(Instruction_wire[31:26]),
-	.function(Instruction_wire[5:0]),
+	.instructionFunct(Instruction_wire[5:0]),
 	.RegDst(RegDst_wire),
 	.BranchEQ(BranchEQ_wire),
 	.BranchNE(BranchNE_wire),
