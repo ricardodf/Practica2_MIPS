@@ -49,7 +49,7 @@ wire [4:0] WriteRegister_wire;
 wire [4:0] muxraOut;
 wire [4:0] MuxPcJROut;
 wire [27:0] inst_shift;
-wire [31:0] ReadDataOutWire;
+wire [31:0] ReadDataOut_Wire;
 wire [31:0] MUX_PX_wire;
 wire [31:0] PC_wire;
 wire [31:0] Instruction_wire;
@@ -63,7 +63,7 @@ wire [31:0] InmmediateExtendAnded_wire;
 wire [31:0] PCtoBranch_wire;
 wire [31:0] ReadDataALUResultOut_Wire;
 wire [31:0] shiftBranch_wire;
-wire [31:0] addOutBranch_wire;
+wire [31:0] addBranchOut_wire;
 wire [31:0] Mux_BranchResult;
 wire [31:0] JumpOut;
 wire [31:0] MuxPcOut;
@@ -176,12 +176,12 @@ DataMemory
 )
 RAM
 (
-	.WriteData(read_data_2_wire),
-	.Address(alu_result_wire),
+	.WriteData(ReadData2_wire),
+	.Address(ALUResult_wire),
 	.MemWrite(MemWrite_wire),
 	.MemRead(MemRead_wire),
 	.clk(clk),
-	.ReadData(ReadDataOutWire)
+	.ReadData(ReadDataOut_Wire)
 );
 
 Multiplexer2to1
@@ -191,15 +191,27 @@ Multiplexer2to1
 MUX_ForReadDataAndALUResult
 (
 	.Selector(MemtoReg_wire),
-	.MUX_Data0(alu_result_wire),
-	.MUX_Data1(ReadDataOutWire),
-	
+	.MUX_Data0(ALUResult_wire),
+	.MUX_Data1(ReadDataOut_Wire),
 	.MUX_Output(ReadDataALUResultOut_Wire)
-
 );
-
-	
 	
 assign ALUResultOut = ALUResult_wire;
+	
+ShiftLeft2 
+shiftBranch
+(   
+	.DataInput(InmmediateExtend_wire),
+	.DataOutput(shiftBranch_wire)
+);
+
+Adder32bits
+Add_ShiftBranch
+(
+	.Data0(PC_4_wire),
+	.Data1(shiftBranch_wire),
+	.Result(addBranchOut_wire)
+);
+	
 endmodule
 
