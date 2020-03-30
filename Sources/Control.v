@@ -14,7 +14,7 @@
 module Control
 (
 	input [5:0]OP,
-	input [5:0]function,
+	input [5:0]instructionFunct,
 	output RegDst,
 	output BranchEQ,
 	output BranchNE,
