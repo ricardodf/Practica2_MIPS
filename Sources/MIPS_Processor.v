@@ -46,9 +46,9 @@ wire jrWire;
 wire [2:0] ALUOp_wire;
 wire [3:0] ALUOperation_wire;
 wire [4:0] WriteRegister_wire;
-wire [4:0] muxraOut;
+wire [4:0] RaMux_Out;
 wire [4:0] MuxPcJROut;
-wire [27:0] inst_shift;
+wire [27:0] i_shift_Wire;
 wire [31:0] ReadDataOut_Wire;
 wire [31:0] MUX_PX_wire;
 wire [31:0] PC_wire;
@@ -64,10 +64,10 @@ wire [31:0] PCtoBranch_wire;
 wire [31:0] ReadDataALUResultOut_Wire;
 wire [31:0] shiftBranch_wire;
 wire [31:0] addBranchOut_wire;
-wire [31:0] Mux_BranchResult;
+wire [31:0] MuxBranch_Result;
 wire [31:0] JumpOut;
-wire [31:0] MuxPcOut;
-wire [31:0] MuxPcFinalOut;
+wire [31:0] PCMux_Out;
+wire [31:0] FinalPCMux_Out;
 integer ALUStatus;
 	
 Control
@@ -213,5 +213,66 @@ Add_ShiftBranch
 	.Result(addBranchOut_wire)
 );
 	
-endmodule
+Multiplexer2to1
+#(
+	.NBits(32)
+)
+Mux_AddBranch
+(
+	.Selector((BranchEQ_wire & Zero_wire)|(BranchNE_wire & ~Zero_wire)),
+	.MUX_Data0(PC_4_wire),
+	.MUX_Data1(addBranchOut_wire),
+	.MUX_Output(MuxBranch_Result)
+);
 
+assign i_shift_Wire = Instruction_wire[25:0]<<2;
+
+Multiplexer2to1
+#(
+	.NBits(32)
+)
+JumpMux
+(
+	.Selector(jumpWire),
+	.MUX_Data0(MuxBranch_Result),
+	.MUX_Data1({PC_4_wire[31:28] , i_shift_Wire}),
+	.MUX_Output(JumpOut)
+);
+
+Multiplexer2to1
+#(
+	.NBits(5)
+)
+RaMux
+(
+	.Selector(jalWire),
+	.MUX_Data0(WriteRegister_wire),
+	.MUX_Data1(31),
+	.MUX_Output(RaMux_Out)
+);
+
+Multiplexer2to1
+#(
+	.NBits(32)
+)
+PCMux
+(
+	.Selector(jalWire),
+	.MUX_Data0(ReadDataALUResultOut_Wire),
+	.MUX_Data1(PC_4_wire),
+	.MUX_Output(PCMux_Out)
+);
+
+Multiplexer2to1
+#(
+	.NBits(32)
+)
+MuxPCJR
+(
+	.Selector(jrWire),
+	.MUX_Data0(JumpOut),
+	.MUX_Data1(ReadData1_wire),
+	.MUX_Output(FinalPCMux_Out)
+);
+	
+endmodule
