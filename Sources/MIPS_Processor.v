@@ -135,8 +135,6 @@ SignExtendForConstants
    .SignExtendOutput(InmmediateExtend_wire)
 );
 
-
-
 Multiplexer2to1
 #(
 	.NBits(32)
@@ -148,7 +146,6 @@ MUX_ForReadDataAndInmediate
 	.MUX_Data1(InmmediateExtend_wire),
 	.MUX_Output(ReadData2OrInmmediate_wire)
 );
-
 
 ALUControl
 ArithmeticLogicUnitControl
