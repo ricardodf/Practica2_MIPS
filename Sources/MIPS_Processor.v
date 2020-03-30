@@ -74,12 +74,19 @@ Control
 ControlUnit
 (
 	.OP(Instruction_wire[31:26]),
+	.function(Instruction_wire[5:0]),
 	.RegDst(RegDst_wire),
-	.BranchNE(BranchNE_wire),
 	.BranchEQ(BranchEQ_wire),
+	.BranchNE(BranchNE_wire),
+	.MemRead(MemRead_wire),
+	.MemtoReg(MemtoReg_wire),
+	.MemWrite(MemWrite_wire),
+	.ALUSrc(alu_src_wire),
+	.RegWrite(reg_write_wire),
 	.ALUOp(ALUOp_wire),
-	.ALUSrc(ALUSrc_wire),
-	.RegWrite(RegWrite_wire)
+	.jump(jumpWire),
+	.jal(jalWire),
+	.jr(jrWire)
 );
 
 PC_Register ProgramCounter(
