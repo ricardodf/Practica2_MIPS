@@ -60,4 +60,4 @@ localparam SRL = 4'b0111;
 		endcase // case(control)
 		Zero = (ALUResult==0) ? 1'b1 : 1'b0;
      end // always @ (A or B or control)
-// alu//
+endmodule
