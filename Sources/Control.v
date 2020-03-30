@@ -71,6 +71,6 @@ assign BranchEQ = ControlValues[3];
 assign ALUOp = ControlValues[2:0];
 assign jump = (OP==J_Type_J || OP==J_Type_Jal) ? 1'b1 : 1'b0;
 assign jal =  (OP==J_Type_Jal) ? 1'b1 : 1'b0;
-assign jr = (func==6'h08 && OP==R_Type) ? 1'b1 : 1'b0;
+assign jr = (instructionFunct==6'h08 && OP==R_Type) ? 1'b1 : 1'b0;
 
 endmodule
