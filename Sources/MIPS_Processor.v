@@ -6,11 +6,10 @@ Description
 	* be execute. If the size of the program changes, thus, MEMORY_DEPTH must change.
 	* This processor was made for computer organization class at ITESO.
 ******************************************************************/
-
-
 module MIPS_Processor
 #(
-	parameter MEMORY_DEPTH = 32
+	parameter MEMORY_DEPTH = 1024,
+	parameter INCREMENT = 4
 )
 
 (
@@ -38,9 +37,19 @@ wire ORForBranch;
 wire ALUSrc_wire;
 wire RegWrite_wire;
 wire Zero_wire;
+wire MemRead_wire;
+wire MemtoReg_wire;
+wire MemWrite_wire;
+wire jumpWire;
+wire jalWire;
+wire jrWire;
 wire [2:0] ALUOp_wire;
 wire [3:0] ALUOperation_wire;
 wire [4:0] WriteRegister_wire;
+wire [4:0] muxraOut;
+wire [4:0] MuxPcJROut;
+wire [27:0] inst_shift;
+wire [31:0] ReadDataOutWire;
 wire [31:0] MUX_PX_wire;
 wire [31:0] PC_wire;
 wire [31:0] Instruction_wire;
@@ -52,14 +61,15 @@ wire [31:0] ALUResult_wire;
 wire [31:0] PC_4_wire;
 wire [31:0] InmmediateExtendAnded_wire;
 wire [31:0] PCtoBranch_wire;
+wire [31:0] ReadDataALUResultOut_Wire;
+wire [31:0] shiftBranch_wire;
+wire [31:0] addOutBranch_wire;
+wire [31:0] Mux_BranchResult;
+wire [31:0] JumpOut;
+wire [31:0] MuxPcOut;
+wire [31:0] MuxPcFinalOut;
 integer ALUStatus;
-
-
-//******************************************************************/
-//******************************************************************/
-//******************************************************************/
-//******************************************************************/
-//******************************************************************/
+	
 Control
 ControlUnit
 (
@@ -89,16 +99,9 @@ ROMProgramMemory
 Adder32bits PC_Puls_4(
 	.Data0(PC_wire),
 	.Data1(4),
-	
 	.Result(PC_4_wire)
 );
 
-
-//******************************************************************/
-//******************************************************************/
-//******************************************************************/
-//******************************************************************/
-//******************************************************************/
 Multiplexer2to1
 #(
 	.NBits(5)
@@ -108,12 +111,8 @@ MUX_ForRTypeAndIType
 	.Selector(RegDst_wire),
 	.MUX_Data0(Instruction_wire[20:16]),
 	.MUX_Data1(Instruction_wire[15:11]),
-	
 	.MUX_Output(WriteRegister_wire)
-
 );
-
-
 
 RegisterFile
 Register_File
@@ -127,13 +126,12 @@ Register_File
 	.WriteData(ALUResult_wire),
 	.ReadData1(ReadData1_wire),
 	.ReadData2(ReadData2_wire)
-
 );
 
 SignExtend
 SignExtendForConstants
 (   
-	.DataInput(Instruction_wire[15:0]),
+   .DataInput(Instruction_wire[15:0]),
    .SignExtendOutput(InmmediateExtend_wire)
 );
 
@@ -148,9 +146,7 @@ MUX_ForReadDataAndInmediate
 	.Selector(ALUSrc_wire),
 	.MUX_Data0(ReadData2_wire),
 	.MUX_Data1(InmmediateExtend_wire),
-	
 	.MUX_Output(ReadData2OrInmmediate_wire)
-
 );
 
 
@@ -160,10 +156,7 @@ ArithmeticLogicUnitControl
 	.ALUOp(ALUOp_wire),
 	.ALUFunction(Instruction_wire[5:0]),
 	.ALUOperation(ALUOperation_wire)
-
 );
-
-
 
 ALU
 Arithmetic_Logic_Unit 
@@ -171,12 +164,42 @@ Arithmetic_Logic_Unit
 	.ALUOperation(ALUOperation_wire),
 	.A(ReadData1_wire),
 	.B(ReadData2OrInmmediate_wire),
+	.shamt(instruction_bus_wire[10:6]),
 	.Zero(Zero_wire),
 	.ALUResult(ALUResult_wire)
 );
 
+DataMemory 
+#(	
+	.DATA_WIDTH(32),
+	.MEMORY_DEPTH(256)
+)
+RAM
+(
+	.WriteData(read_data_2_wire),
+	.Address(alu_result_wire),
+	.MemWrite(MemWrite_wire),
+	.MemRead(MemRead_wire),
+	.clk(clk),
+	.ReadData(ReadDataOutWire)
+);
+
+Multiplexer2to1
+#(
+	.NBits(32)
+)
+MUX_ForReadDataAndALUResult
+(
+	.Selector(MemtoReg_wire),
+	.MUX_Data0(alu_result_wire),
+	.MUX_Data1(ReadDataOutWire),
+	
+	.MUX_Output(ReadDataALUResultOut_Wire)
+
+);
+
+	
+	
 assign ALUResultOut = ALUResult_wire;
-
-
 endmodule
 
