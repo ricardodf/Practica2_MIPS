@@ -8,16 +8,13 @@ Description
 ******************************************************************/
 module MIPS_Processor
 #(
-	parameter MEMORY_DEPTH = 1024,
-	parameter INCREMENT = 4
+	parameter MEMORY_DEPTH = 1024
 )
 
 (
-	// Inputs
 	input clk,
 	input reset,
 	input [7:0] PortIn,
-	// Output
 	output [31:0] ALUResultOut,
 	output [31:0] PortOut
 );
@@ -92,7 +89,7 @@ ControlUnit
 PC_Register ProgramCounter(
     .clk(clk),
     .reset(reset),
-    .NewPC(PC_4_wire),
+    .NewPC(FinalPCMux_Out),
     .PCValue(PC_wire)
 );
 
