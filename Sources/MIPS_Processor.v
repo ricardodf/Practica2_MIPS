@@ -121,10 +121,10 @@ Register_File
 	.clk(clk),
 	.reset(reset),
 	.RegWrite(RegWrite_wire),
-	.WriteRegister(WriteRegister_wire),
+	.WriteRegister(RaMux_Out),
 	.ReadRegister1(Instruction_wire[25:21]),
 	.ReadRegister2(Instruction_wire[20:16]),
-	.WriteData(ALUResult_wire),
+	.WriteData(PCMux_Out),
 	.ReadData1(ReadData1_wire),
 	.ReadData2(ReadData2_wire)
 );
@@ -136,10 +136,7 @@ SignExtendForConstants
    .SignExtendOutput(InmmediateExtend_wire)
 );
 
-Multiplexer2to1
-#(
-	.NBits(32)
-)
+Multiplexer2to1#(.NBits(32))
 MUX_ForReadDataAndInmediate
 (
 	.Selector(ALUSrc_wire),
@@ -167,11 +164,7 @@ Arithmetic_Logic_Unit
 	.ALUResult(ALUResult_wire)
 );
 
-DataMemory 
-#(	
-	.DATA_WIDTH(32),
-	.MEMORY_DEPTH(256)
-)
+DataMemory #(	.DATA_WIDTH(32), .MEMORY_DEPTH(256))
 RAM
 (
 	.WriteData(ReadData2_wire),
@@ -182,10 +175,7 @@ RAM
 	.ReadData(ReadDataOut_Wire)
 );
 
-Multiplexer2to1
-#(
-	.NBits(32)
-)
+Multiplexer2to1#(.NBits(32))
 MUX_ForReadDataAndALUResult
 (
 	.Selector(MemtoReg_wire),
@@ -211,10 +201,7 @@ Add_ShiftBranch
 	.Result(addBranchOut_wire)
 );
 	
-Multiplexer2to1
-#(
-	.NBits(32)
-)
+Multiplexer2to1#(.NBits(32))
 Mux_AddBranch
 (
 	.Selector((BranchEQ_wire & Zero_wire)|(BranchNE_wire & ~Zero_wire)),
@@ -225,10 +212,7 @@ Mux_AddBranch
 
 assign i_shift_Wire = Instruction_wire[25:0]<<2;
 
-Multiplexer2to1
-#(
-	.NBits(32)
-)
+Multiplexer2to1#(.NBits(32))
 JumpMux
 (
 	.Selector(jumpWire),
@@ -237,10 +221,7 @@ JumpMux
 	.MUX_Output(JumpOut)
 );
 
-Multiplexer2to1
-#(
-	.NBits(5)
-)
+Multiplexer2to1#(.NBits(5))
 RaMux
 (
 	.Selector(jalWire),
@@ -249,10 +230,7 @@ RaMux
 	.MUX_Output(RaMux_Out)
 );
 
-Multiplexer2to1
-#(
-	.NBits(32)
-)
+Multiplexer2to1#(.NBits(32))
 PCMux
 (
 	.Selector(jalWire),
@@ -261,11 +239,8 @@ PCMux
 	.MUX_Output(PCMux_Out)
 );
 
-Multiplexer2to1
-#(
-	.NBits(32)
-)
-MuxPCJR
+Multiplexer2to1#(.NBits(32))
+PCJRMux
 (
 	.Selector(jrWire),
 	.MUX_Data0(JumpOut),
