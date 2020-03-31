@@ -81,8 +81,8 @@ ControlUnit
 	.MemRead(MemRead_wire),
 	.MemtoReg(MemtoReg_wire),
 	.MemWrite(MemWrite_wire),
-	.ALUSrc(alu_src_wire),
-	.RegWrite(reg_write_wire),
+	.ALUSrc(ALUSrc_wire),
+	.RegWrite(RegWrite_wire),
 	.ALUOp(ALUOp_wire),
 	.jump(jumpWire),
 	.jal(jalWire),
@@ -109,10 +109,7 @@ Adder32bits PC_Puls_4(
 	.Result(PC_4_wire)
 );
 
-Multiplexer2to1
-#(
-	.NBits(5)
-)
+Multiplexer2to1#(.NBits(5))
 MUX_ForRTypeAndIType
 (
 	.Selector(RegDst_wire),
