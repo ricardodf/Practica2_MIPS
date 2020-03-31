@@ -11,7 +11,7 @@
 ******************************************************************/
 module Register
 #(
-	parameter N=32
+	parameter N=32,
 	parameter offset = 0
 )
 (
